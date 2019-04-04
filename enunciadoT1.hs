@@ -32,6 +32,7 @@ seguindo o plano ou em caráter emergencial(SOS). Eventualmente, o paciente ou r
 medicamentos, o que é feito num mercado em que farmácias oferecem determinados medicamentos a preços 
 específicos. Um objetivo prático é diminuir o custo com a aquisição de medicamentos. Considerando a 
 definição de tipos abaixo:
+-}
 
 type Nome = String
 type Quantidade = Int
@@ -43,47 +44,53 @@ type Medicamentos = [Medicamento]
 type Prescricao = (Nome,Horario,HorarioProximo)
 type PlanoMedicamento = [Prescricao]
 
--}
-
 {- 
 Defina as seguintes funções abaixo:
 
 **QUESTÃO 1, valor 1,0 ponto**
 Defina a função adicionarMedicamento que adiciona medicamento à lista de medicamentos em qualquer 
 posição da lista de medicamentos.  Se o medicamento já existir na lista de medicamentos, então 
- a sua quantidade deve ser atualizada na lista. O tipo da função adicionarMedicamento é o seguinte:
-
- adicionarMedicamento :: Medicamento -> Medicamentos -> Medicamentos 
+a sua quantidade deve ser atualizada na lista. O tipo da função adicionarMedicamento é o seguinte:
 -}
-                                    
+adicionarMedicamento :: Medicamento -> Medicamentos -> Medicamentos 
+adicionarMedicamento (nome, qtd) [] = (nome, qtd) : [] -- Retorna o elemento adicionado
+adicionarMedicamento (nome, qtd) ((n, q):res)
+    | nome == n     = (n, q + qtd) : res -- Altera a quantidade se o remedio ja existir
+    | otherwise     = (n, q) : adicionarMedicamento (nome, qtd) res -- Adiciona o Medicamento à lista
+    
 {-
 **QUESTÃO 2, valor 1,0 ponto**
 Defina a função removerMedicamento que, a partir do nome de um medicamento e de uma lista de medicamentos,
 retorna uma nova lista em que o medicamento com esse nome é removido da lista. Se o medicamento não 
 existir, a lista original de medicamentos é retornada. O tipo da função removerMedicamento é o seguinte:
-
-removerMedicamento :: Nome -> Medicamentos -> Medicamentos
 -}
-
+removerMedicamento :: Nome -> Medicamentos -> Medicamentos
+removerMedicamento _ []                 = [] -- Retorna a lista vazia
+removerMedicamento nome ((n,q):res)
+  | nome == n    = removerMedicamento nome res -- 
+  | otherwise    = (n,q) : removerMedicamento nome res
 {- 
 **QUESTÃO 3, valor 0,5 ponto**
 Defina a função consultarMedicamento que, a partir do nome de um medicamento e de uma lista de medicamentos,
 retorna esse medicamento, ou seja, um par (Nome,Quantidade) com as informações desse medicamento.
 Se o medicamento não existir, retorne o par ("",0). O tipo da função consultarMedicamento é o seguinte:
-
-consultarMedicamento :: Nome -> Medicamentos -> Medicamento
 -}
-                            
+consultarMedicamento :: Nome -> Medicamentos -> Medicamento
+consultarMedicamento nome [] = ("",0)
+consultarMedicamento nome ((n,q):res)
+  | nome == n   = (n,q)
+  | otherwise   = consultarMedicamento nome res
 {- 
 **QUESTÃO 4, valor 1,0 ponto**
 Defina a função alterarMedicamento que, a partir de um medicamento e de uma lista de medicamentos,
 retorna uma nova lista de medicamentos em que esse medicamento seja atualizado na lista de medicamentos.
 Se o medicamento não existir, a lista orginal de medicamentos é retornada.
 O tipo da função alterarMedicamento é o seguinte:
-
-alterarMedicamento :: Medicamento -> Medicamentos -> Medicamentos
 -}
-       
+alterarMedicamento :: Medicamento -> Medicamentos -> Medicamentos
+alterarMedicamento (nome, qtd) [] = []
+alterarMedicamento (nome, qtd) ((n, q):res)
+  | nome == n   = (n, q) : res
 
 {- 
 **QUESTÃO 5, valor 1,0 ponto
@@ -91,10 +98,12 @@ Defina a função tomarMedicamentoSOS que, a partir do nome de um medicamento e 
 retorna uma nova lista de medicamentos em que a quantidade desse remédio é diminuída em uma unidade.
 Se não existir medicamento com o nome fornecido, a lista orginal de medicamentos é retornada.
 O tipo da função tomarMedicamentoSOS é o seguinte:
-
-tomarMedicamentoSOS  ::  Nome -> Medicamentos ->  Medicamentos
 -}
-                                 
+tomarMedicamentoSOS  ::  Nome -> Medicamentos ->  Medicamentos
+tomarMedicamentoSOS nome [] = []
+tomarMedicamentoSOS nome ((n,q):res)
+  | nome == n   = (n, q - 1) : res
+  | otherwise   = tomarMedicamentoSOS nome res
 {- 
 **QUESTÃO 6, valor 1,0 ponto
 Defina a função tomarMedicamentosHorario que, a partir  de um plano de medicamentos, de uma lista de 
@@ -106,7 +115,7 @@ horário previsto. O tipo da função tomarMedicamentosHorario é o seguinte:
 
 tomarMedicamentosHorario :: PlanoMedicamento -> Medicamentos -> HoraAtual -> (PlanoMedicamento,Medicamentos)
 -}
-                                   
+
 
 {- 
 **QUESTÃO 7, valor 1,0 ponto
@@ -117,7 +126,7 @@ O tipo da função cadastrarAlarmes é o seguinte:
 cadastrarAlarmes :: PlanoMedicamento -> Horario
 -}                                               
 
-                         
+
 {- 
 **QUESTÃO 8, valor 1,0 ponto
 Defina a função listarMedicamentosComprar que, sendo fornecida uma lista de medicamentos, retorna
@@ -181,16 +190,14 @@ Dica: para cada medicamento, busque no mercado uma farmácia em que ele pode com
 Considere chamar a função comprarMedicamentosPreco para ajudar nessa computação. Com isso, podemos 
 saber para cada uma dessas farmácias quais são os remédios mais baratos que podemos comprar lá.
 -}
- 
+
 
 
 {- **QUESTÃO EXTRA 2, valendo 0,5 ponto a mais. Somente uma questão extra será considerada.
- Defina uma função careTaker que simule as ações requeridas por um cuidador para que ele(a) administre 
- medicamentos de acordo com o plano de medicamentos e por uma certa quantidade de dias, a partir de um
- estoque inicial de remédios.
- O tipo da função careTaker é o seguinte:
- 
- careTaker :: PlanoMedicamento -> Int -> Medicamentos-> (PlanoMedicamento,Medicamentos)
--}
- 
+Defina uma função careTaker que simule as ações requeridas por um cuidador para que ele(a) administre 
+medicamentos de acordo com o plano de medicamentos e por uma certa quantidade de dias, a partir de um
+estoque inicial de remédios.
+O tipo da função careTaker é o seguinte:
 
+careTaker :: PlanoMedicamento -> Int -> Medicamentos-> (PlanoMedicamento,Medicamentos)
+-}
