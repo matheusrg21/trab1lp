@@ -113,8 +113,17 @@ eventualmente previstos para aquele horário. Isso resulta em que a quantidade d
 atualizada e em que o plano seja atualizado no sentido em que tais remedios sejam tomados no próximo 
 horário previsto. O tipo da função tomarMedicamentosHorario é o seguinte:
 
-tomarMedicamentosHorario :: PlanoMedicamento -> Medicamentos -> HoraAtual -> (PlanoMedicamento,Medicamentos)
+type Prescricao = (Nome,Horario,HorarioProximo)
+type PlanoMedicamento = [Prescricao]
+type HoraAtual = Int
+type Horario = [Int]
+type HorarioProximo = Int
 -}
+tomarMedicamentosHorario :: PlanoMedicamento -> Medicamentos -> HoraAtual -> (PlanoMedicamento,Medicamentos)
+tomarMedicamentosHorario _ [] _ = ([("", [0], 0)], [])
+tomarMedicamentosHorario ((nome, ((atual:restoHora)), horaProx):restoPlano) ((nomeMed,qtdMed):restoMedicamento) horaAtual
+  | horaAtual == horaProx  = (((nome, ((atual:restoHora)), horaProx):restoPlano), (nomeMed, qtdMed - 1):restoMedicamento)
+  | otherwise              = tomarMedicamentosHorario restoPlano restoMedicamento horaAtual
 
 
 {- 
