@@ -44,6 +44,25 @@ type Medicamentos = [Medicamento]
 type Prescricao = (Nome,Horario,HorarioProximo)
 type PlanoMedicamento = [Prescricao]
 
+plano1 :: PlanoMedicamento
+plano1 = [("R1", [6,10,14], 6),
+          ("R2", [8,13,18], 8),
+          ("R3", [2,3,4], 2)
+         ]
+
+
+medicamento1 :: Medicamento
+medicamento1 = ("R1", 5)
+
+medicamento2 :: Medicamento
+medicamento2 = ("R2", 8)
+
+medicamento3 :: Medicamento
+medicamento3 = ("R3", 6)
+
+medicamentos1 :: Medicamentos
+medicamentos1 = [medicamento1, medicamento2, medicamento3]
+
 {- 
 Defina as seguintes funções abaixo:
 
