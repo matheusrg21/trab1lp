@@ -137,12 +137,12 @@ type PlanoMedicamento = [Prescricao]
 type HoraAtual = Int
 type Horario = [Int]
 type HorarioProximo = Int
--}
 tomarMedicamentosHorario :: PlanoMedicamento -> Medicamentos -> HoraAtual -> (PlanoMedicamento,Medicamentos)
 tomarMedicamentosHorario _ [] _ = ([("", [0], 0)], [])
 tomarMedicamentosHorario ((nome, ((atual:restoHora)), horaProx):restoPlano) ((nomeMed,qtdMed):restoMedicamento) horaAtual
-  | horaAtual == horaProx  = (((nome, ((atual:restoHora)), horaProx):restoPlano), (nomeMed, qtdMed - 1):restoMedicamento)
-  | otherwise              = tomarMedicamentosHorario restoPlano restoMedicamento horaAtual
+| horaAtual == horaProx  = (((nome, ((atual:restoHora)), horaProx):restoPlano), (nomeMed, qtdMed - 1):restoMedicamento)
+| otherwise              = tomarMedicamentosHorario restoPlano restoMedicamento horaAtual
+-}
 
 
 {- 
