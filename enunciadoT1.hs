@@ -58,7 +58,7 @@ medicamento2 :: Medicamento
 medicamento2 = ("R2", 8)
 
 medicamento3 :: Medicamento
-medicamento3 = ("R3", 6)
+medicamento3 = ("R3", 0)
 
 medicamentos1 :: Medicamentos
 medicamentos1 = [medicamento1, medicamento2, medicamento3]
@@ -160,9 +160,12 @@ cadastrarAlarmes :: PlanoMedicamento -> Horario
 Defina a função listarMedicamentosComprar que, sendo fornecida uma lista de medicamentos, retorna
 uma lista dos medicamentos que precisam ser comprados, ou seja, aqueles cuja quantidade tenha zerado.
 O tipo da função listarMedicamentosComprar é o seguinte:
-
-listarMedicamentosComprar :: Medicamentos ->  Medicamentos
 -}                                                                       
+listarMedicamentosComprar :: Medicamentos ->  Medicamentos
+listarMedicamentosComprar [] = []
+listarMedicamentosComprar ((nome, qtd):res)
+    | qtd == 0     = (nome, qtd) : res -- Verifica se a quantidade do remedio eh zero e salva para mostrar
+    | otherwise    = listarMedicamentosComprar res -- Caso contrario faz a recursao
 
 
 {- 
