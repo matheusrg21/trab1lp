@@ -45,9 +45,9 @@ type Prescricao = (Nome,Horario,HorarioProximo)
 type PlanoMedicamento = [Prescricao]
 
 plano1 :: PlanoMedicamento
-plano1 = [("R1", [6,10,14], 6),
+plano1 = [("R1", [6,10,14,20], 6),
           ("R2", [8,13,18], 8),
-          ("R3", [2,3,4], 2)
+          ("R3", [2,3,4,5,6], 2)
          ]
 
 
@@ -62,6 +62,9 @@ medicamento3 = ("R3", 0)
 
 medicamentos1 :: Medicamentos
 medicamentos1 = [medicamento1, medicamento2, medicamento3]
+
+medicamentos2 :: Medicamentos
+medicamentos2 = [("R1", 3), ("R4", 2), ("R5", 3)]
 
 {- 
 Defina as seguintes funções abaixo:
@@ -175,10 +178,19 @@ medicamentos e um número de dias, deve retornar os medicamentos a serem comprad
 de acordo o plano de medicamentos para o número de dias informado e a partir de um estoque inicial de 
 medicamentos especificado pela lista de medicamentos informado na chamada da função. 
 O tipo da função comprarMedicamentosDias é o seguinte: 
-
-comprarMedicamentosDias ::  PlanoMedicamento -> Medicamentos -> Int -> Medicamentos
+plano1 = [("R1", [6,10,14], 6),
+          ("R2", [8,13,18], 8),
+          ("R3", [2,3,4], 2)
+         ]
+plmedicamento3 = ("R3", 0)
 -}
-
+comprarMedicamentosDias ::  PlanoMedicamento -> Medicamentos -> Int -> Medicamentos
+comprarMedicamentosDias [] _ _ = [] -- Plano de medicamentos vazio, retorna vazio
+comprarMedicamentosDias _ [] _ = [] -- Medicamentos vazio, retorna vazio
+comprarMedicamentosDias _ _ 0  = [] -- Dias igual a zero, retorna vazio
+comprarMedicamentosDias ((nome, horario, horaProx):restoPlano) ((nomeMed, qtdMed):restoMedicamento) dias
+  | nome == nomeMed   = (nomeMed,(length horario * dias)): comprarMedicamentosDias (restoPlano) (restoMedicamento) (dias) -- Se o nome do remedio tiver no plano, cal
+  | otherwise         = comprarMedicamentosDias (restoPlano) (restoMedicamento) (dias)
 
 {- 
 **QUESTÃO 10, valor 1,5 ponto
