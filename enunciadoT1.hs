@@ -33,6 +33,7 @@ medicamentos, o que é feito num mercado em que farmácias oferecem determinados
 específicos. Um objetivo prático é diminuir o custo com a aquisição de medicamentos. Considerando a 
 definição de tipos abaixo:
 -}
+import Data.List
 
 type Nome = String
 type Quantidade = Int
@@ -153,9 +154,18 @@ tomarMedicamentosHorario ((nome, ((atual:restoHora)), horaProx):restoPlano) ((no
 Defina a função cadastrarAlarmes que, dado um plano de medicamento, retorna uma grade horária única 
 crescentemente ordenada de todos os instantes em que o paciente deve tomar seus medicamentos.
 O tipo da função cadastrarAlarmes é o seguinte:
+-}                                               
+
+removerDuplicado :: Eq a => [a] -> [a]
+removerDuplicado [] = []
+removerDuplicado (x:xs)   | x `elem` xs   = removerDuplicado xs
+                | otherwise     = x : removerDuplicado xs
 
 cadastrarAlarmes :: PlanoMedicamento -> Horario
--}                                               
+cadastrarAlarmes [] = []
+cadastrarAlarmes ((nome, horarios, horaProx):restoPlano)
+  | length horarios > 1  = sort (removerDuplicado ((horarios++(cadastrarAlarmes restoPlano))))
+  | otherwise            = horarios
 
 
 {- 
@@ -200,22 +210,23 @@ ser gasto nela com a compra dos medicamentos. Essa farmácia deve ser tal que te
 na quantidade necessária para cada medicamento e que tenha o menor preço para a compra deles. 
 O tipo da função comprarMedicamentosPreco é o seguinte: 
 
-comprarMedicamentosPreco :: Medicamentos -> Mercado -> Compra
 
 Considere que os coneitos de farmácia, mercado, e compra sejam conforme abaixo:
-
-type Preco = Int
-type Farmacia = (Nome,[(Medicamento,Preco)])
-type Mercado = [Farmacia]
-type Compra = (Preco, Nome)
 
 **Dica: determine as farmacias que tem todos os medicamentos requeridos na quantidade necessária; 
 orce os medicamentos em cada uma dessas farmácias e, dentre estas, escolha a que oferece o menor 
 preço pelo total dos medicamentos necessarios. Se existir mais de uma farmácia que ofereça esse 
 mesmo preço total, escolha qualquer uma.
 -}
+type Preco = Int
+type Farmacia = (Nome,[(Medicamento,Preco)])
+type Mercado = [Farmacia]
+type Compra = (Preco, Nome)
 
-
+comprarMedicamentosPreco :: Medicamentos -> Mercado -> Compra
+comprarMedicamentosPreco ((nomeMed, qtdMed):restoMedicamento) ((nomeFar,((nomeMedFar,qtdMedFar), preco):restoMedPre)):restoMercado
+  | nomeMed == nomeMedFar && qtdMed <= qtdMedFar   = 
+  | otherwise                                      = 
 {- **QUESTÃO EXTRA 1, valendo 0,5 ponto a mais na lista.
 Defina a função comprarMedicamentosPrecoFlex que, a partir de uma lista de medicamentos e de um
 mercado, obtenha uma lista de compras. A compra agora é flexível. Uma farmácia não precisa ter 
