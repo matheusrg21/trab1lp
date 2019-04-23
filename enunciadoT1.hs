@@ -135,20 +135,24 @@ O comportamento da função deve ser tal que, no horário atual, o paciente tome
 eventualmente previstos para aquele horário. Isso resulta em que a quantidade desses medicamentos seja 
 atualizada e em que o plano seja atualizado no sentido em que tais remedios sejam tomados no próximo 
 horário previsto. O tipo da função tomarMedicamentosHorario é o seguinte:
-
-type Prescricao = (Nome,Horario,HorarioProximo)
-type PlanoMedicamento = [Prescricao]
-type HoraAtual = Int
-type Horario = [Int]
-type HorarioProximo = Int
+-}
 tomarMedicamentosHorario :: PlanoMedicamento -> Medicamentos -> HoraAtual -> (PlanoMedicamento,Medicamentos)
 tomarMedicamentosHorario _ [] _ = ([("", [0], 0)], [])
 tomarMedicamentosHorario p_plano p_medicamentos p_horaAtual = (planoFinal, medicamentosFinal)
+  where
+    medicamentosParaAtualizar = [nome | (nome,horarios,horaProx) <- p_plano, horaProx == p_horaAtual]
+    planoFinal            = atualizarPlano p_plano p_horaAtual
+    medicamentosFinal     = atualizarMedicamentos medicamentosParaAtualizar p_medicamentos
 
-tomarMedicamentosHorario ((nome, ((atual:restoHora)), horaProx):restoPlano) ((nomeMed,qtdMed):restoMedicamento) horaAtual
-| horaAtual == horaProx  = (((nome, ((atual:restoHora)), horaProx):restoPlano), (nomeMed, qtdMed - 1):restoMedicamento)
-| otherwise              = tomarMedicamentosHorario restoPlano restoMedicamento horaAtual
--}
+atualizarPlano :: PlanoMedicamento -> HoraAtual -> PlanoMedicamento
+atualizarPlano [] _       = []
+atualizarPlano ((nome, ((atual:prox:restoHora)), horaProx):restoPlano) p_horaAtual
+  | p_horaAtual == horaProx  = ((nome, ((atual:prox:restoHora)), prox):restoPlano)
+  | otherwise              = ((nome, ((atual:prox:restoHora)), horaProx):(atualizarPlano restoPlano p_horaAtual))
+
+atualizarMedicamentos :: [Nome] -> Medicamentos -> Medicamentos
+atualizarMedicamentos [] p_medicamentos = p_medicamentos
+atualizarMedicamentos (nomeMedicamentoAtual:restoNomeMedicamentos) p_medicamentos = atualizarMedicamentos restoNomeMedicamentos (tomarMedicamentoSOS nomeMedicamentoAtual p_medicamentos)
 
 
 {- 
@@ -190,11 +194,6 @@ medicamentos e um número de dias, deve retornar os medicamentos a serem comprad
 de acordo o plano de medicamentos para o número de dias informado e a partir de um estoque inicial de 
 medicamentos especificado pela lista de medicamentos informado na chamada da função. 
 O tipo da função comprarMedicamentosDias é o seguinte: 
-plano1 = [("R1", [6,10,14], 6),
-          ("R2", [8,13,18], 8),
-          ("R3", [2,3,4], 2)
-         ]
-plmedicamento3 = ("R3", 0)
 -}
 comprarMedicamentosDias ::  PlanoMedicamento -> Medicamentos -> Int -> Medicamentos
 comprarMedicamentosDias [] _ _ = [] -- Plano de medicamentos vazio, retorna vazio
@@ -229,9 +228,6 @@ comprarMedicamentosPreco ((nomeMed, qtdMed):restoMedicamento) ((nomeFar,((nomeMe
 | nomeMed == nomeMedFar && qtdMed <= qtdMedFar   = []
 | otherwise                                      = 
   -}
-
-sumPrice :: [Int] -> [Int]
-sumPrice lp = [x | x <- lp, mod x 2 == 0, mod x 4 == 0]
 
 {- **QUESTÃO EXTRA 1, valendo 0,5 ponto a mais na lista.
 Defina a função comprarMedicamentosPrecoFlex que, a partir de uma lista de medicamentos e de um
