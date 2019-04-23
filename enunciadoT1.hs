@@ -126,7 +126,7 @@ tomarMedicamentoSOS  ::  Nome -> Medicamentos ->  Medicamentos
 tomarMedicamentoSOS nome [] = []
 tomarMedicamentoSOS nome ((n,q):res)
   | nome == n   = (n, q - 1) : res
-  | otherwise   = tomarMedicamentoSOS nome res
+  | otherwise   = (n, q) : tomarMedicamentoSOS nome res
 {- 
 **QUESTÃO 6, valor 1,0 ponto
 Defina a função tomarMedicamentosHorario que, a partir  de um plano de medicamentos, de uma lista de 
@@ -143,6 +143,8 @@ type Horario = [Int]
 type HorarioProximo = Int
 tomarMedicamentosHorario :: PlanoMedicamento -> Medicamentos -> HoraAtual -> (PlanoMedicamento,Medicamentos)
 tomarMedicamentosHorario _ [] _ = ([("", [0], 0)], [])
+tomarMedicamentosHorario p_plano p_medicamentos p_horaAtual = (planoFinal, medicamentosFinal)
+
 tomarMedicamentosHorario ((nome, ((atual:restoHora)), horaProx):restoPlano) ((nomeMed,qtdMed):restoMedicamento) horaAtual
 | horaAtual == horaProx  = (((nome, ((atual:restoHora)), horaProx):restoPlano), (nomeMed, qtdMed - 1):restoMedicamento)
 | otherwise              = tomarMedicamentosHorario restoPlano restoMedicamento horaAtual
@@ -217,7 +219,6 @@ Considere que os coneitos de farmácia, mercado, e compra sejam conforme abaixo:
 orce os medicamentos em cada uma dessas farmácias e, dentre estas, escolha a que oferece o menor 
 preço pelo total dos medicamentos necessarios. Se existir mais de uma farmácia que ofereça esse 
 mesmo preço total, escolha qualquer uma.
--}
 type Preco = Int
 type Farmacia = (Nome,[(Medicamento,Preco)])
 type Mercado = [Farmacia]
@@ -225,8 +226,13 @@ type Compra = (Preco, Nome)
 
 comprarMedicamentosPreco :: Medicamentos -> Mercado -> Compra
 comprarMedicamentosPreco ((nomeMed, qtdMed):restoMedicamento) ((nomeFar,((nomeMedFar,qtdMedFar), preco):restoMedPre)):restoMercado
-  | nomeMed == nomeMedFar && qtdMed <= qtdMedFar   = 
-  | otherwise                                      = 
+| nomeMed == nomeMedFar && qtdMed <= qtdMedFar   = []
+| otherwise                                      = 
+  -}
+
+sumPrice :: [Int] -> [Int]
+sumPrice lp = [x | x <- lp, mod x 2 == 0, mod x 4 == 0]
+
 {- **QUESTÃO EXTRA 1, valendo 0,5 ponto a mais na lista.
 Defina a função comprarMedicamentosPrecoFlex que, a partir de uma lista de medicamentos e de um
 mercado, obtenha uma lista de compras. A compra agora é flexível. Uma farmácia não precisa ter 
