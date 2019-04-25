@@ -4,6 +4,9 @@
   
   Trabalho1
   
+  MATHEUS RODRIGUES GUIMARAES - 15/0141661 - BCC
+  GABRIEL CUNHA BESSA VIEIRA  - 16/0120811 - BCC
+
   **O trabalho somente pode ser realizado individualmente ou em dupla.
   
   **Prazo de entrega: até dia 24/04/2019, às 23:59h (hora de Brasília)
@@ -44,28 +47,6 @@ type Medicamento = (Nome,Quantidade)
 type Medicamentos = [Medicamento]
 type Prescricao = (Nome,Horario,HorarioProximo)
 type PlanoMedicamento = [Prescricao]
-
-plano1 :: PlanoMedicamento
-plano1 = [("R1", [6,10,14,20], 6),
-          ("R2", [8,13,18], 8),
-          ("R3", [2,3,4,5,6], 2)
-         ]
-
-
-medicamento1 :: Medicamento
-medicamento1 = ("R1", 5)
-
-medicamento2 :: Medicamento
-medicamento2 = ("R2", 8)
-
-medicamento3 :: Medicamento
-medicamento3 = ("R3", 0)
-
-medicamentos1 :: Medicamentos
-medicamentos1 = [medicamento1, medicamento2, medicamento3]
-
-medicamentos2 :: Medicamentos
-medicamentos2 = [("R1", 3), ("R4", 2), ("R5", 3)]
 
 {- 
 Defina as seguintes funções abaixo:
@@ -113,7 +94,8 @@ O tipo da função alterarMedicamento é o seguinte:
 alterarMedicamento :: Medicamento -> Medicamentos -> Medicamentos
 alterarMedicamento (nome, qtd) [] = []
 alterarMedicamento (nome, qtd) ((n, q):res)
-  | nome == n   = (n, q) : res
+  | nome == n   = (n, qtd) : res
+  | otherwise   = (n,q) : alterarMedicamento (nome, qtd) res
 
 {- 
 **QUESTÃO 5, valor 1,0 ponto
@@ -145,16 +127,20 @@ tomarMedicamentosHorario p_plano p_medicamentos p_horaAtual = (planoFinal, medic
     medicamentosFinal     = atualizarMedicamentos medicamentosParaAtualizar p_medicamentos
 
 atualizarPlano :: PlanoMedicamento -> HoraAtual -> PlanoMedicamento
-atualizarPlano [] _       = []
-atualizarPlano ((nome, ((atual:prox:restoHora)), horaProx):restoPlano) p_horaAtual
-  | p_horaAtual == horaProx  = ((nome, ((atual:prox:restoHora)), prox):restoPlano)
-  | otherwise              = ((nome, ((atual:prox:restoHora)), horaProx):(atualizarPlano restoPlano p_horaAtual))
+atualizarPlano [] _ = []
+atualizarPlano ((nome, (p_horarios), horaProx):restoPlano) p_horaAtual
+  | p_horaAtual == horaProx  = [(nome, (p_horarios), (atualizarHoraPlano p_horarios p_horaAtual))]++(atualizarPlano restoPlano p_horaAtual)
+  | otherwise                = ((nome, (p_horarios), horaProx):(atualizarPlano restoPlano p_horaAtual))
 
 atualizarMedicamentos :: [Nome] -> Medicamentos -> Medicamentos
 atualizarMedicamentos [] p_medicamentos = p_medicamentos
 atualizarMedicamentos (nomeMedicamentoAtual:restoNomeMedicamentos) p_medicamentos = atualizarMedicamentos restoNomeMedicamentos (tomarMedicamentoSOS nomeMedicamentoAtual p_medicamentos)
 
-
+atualizarHoraPlano :: Horario -> HoraAtual -> HorarioProximo
+atualizarHoraPlano [] _ = 0
+atualizarHoraPlano (hr:restoHorario) p_atual
+  | [hora | hora <- (hr:restoHorario), hora > p_atual] /= []   = minimum [hora | hora <- (hr:restoHorario), hora > p_atual]
+  | otherwise                                                  = minimum (hr:restoHorario)  
 {- 
 **QUESTÃO 7, valor 1,0 ponto
 Defina a função cadastrarAlarmes que, dado um plano de medicamento, retorna uma grade horária única 
@@ -183,7 +169,7 @@ O tipo da função listarMedicamentosComprar é o seguinte:
 listarMedicamentosComprar :: Medicamentos ->  Medicamentos
 listarMedicamentosComprar [] = []
 listarMedicamentosComprar ((nome, qtd):res)
-    | qtd == 0     = (nome, qtd) : res -- Verifica se a quantidade do remedio eh zero e salva para mostrar
+    | qtd == 0     = (nome, qtd) : listarMedicamentosComprar res -- Verifica se a quantidade do remedio eh zero e salva para mostrar
     | otherwise    = listarMedicamentosComprar res -- Caso contrario faz a recursao
 
 
@@ -200,7 +186,8 @@ comprarMedicamentosDias [] _ _ = [] -- Plano de medicamentos vazio, retorna vazi
 comprarMedicamentosDias _ [] _ = [] -- Medicamentos vazio, retorna vazio
 comprarMedicamentosDias _ _ 0  = [] -- Dias igual a zero, retorna vazio
 comprarMedicamentosDias ((nome, horario, horaProx):restoPlano) ((nomeMed, qtdMed):restoMedicamento) dias
-  | nome == nomeMed   = (nomeMed,(length horario * dias)): comprarMedicamentosDias (restoPlano) (restoMedicamento) (dias) -- Se o nome do remedio tiver no plano, cal
+  | nome == nomeMed && ((length horario * dias) - qtdMed) >= 0  = (nomeMed,((length horario * dias) - qtdMed)): comprarMedicamentosDias (restoPlano) (restoMedicamento) (dias) -- Se o nome do remedio tiver no plano, cal
+  | nome == nomeMed && ((length horario * dias) - qtdMed) < 0  = (nomeMed,0): comprarMedicamentosDias (restoPlano) (restoMedicamento) (dias)
   | otherwise         = comprarMedicamentosDias (restoPlano) (restoMedicamento) (dias)
 
 {- 
@@ -224,10 +211,7 @@ type Mercado = [Farmacia]
 type Compra = (Preco, Nome)
 
 comprarMedicamentosPreco :: Medicamentos -> Mercado -> Compra
-comprarMedicamentosPreco ((nomeMed, qtdMed):restoMedicamento) ((nomeFar,((nomeMedFar,qtdMedFar), preco):restoMedPre)):restoMercado
-| nomeMed == nomeMedFar && qtdMed <= qtdMedFar   = []
-| otherwise                                      = 
-  -}
+-}
 
 {- **QUESTÃO EXTRA 1, valendo 0,5 ponto a mais na lista.
 Defina a função comprarMedicamentosPrecoFlex que, a partir de uma lista de medicamentos e de um
